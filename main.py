@@ -6,95 +6,117 @@ import pandas as pd
 # --- ΡΥΘΜΙΣΕΙΣ ΣΕΛΙΔΑΣ ---
 st.set_page_config(page_title="LogiWork Pass", layout="centered")
 
-# --- ΣΧΕΔΙΑΣΜΟΣ SVG (Ρεαλιστικές Σιλουέτες Ευρωπαϊκών Φορτηγών) ---
-# Φτιάχνουμε κώδικα για να σχεδιαστούν οι σιλουέτες ώστε να μην είναι emoji
-tractor_svg = '<svg viewBox="0 0 24 24" fill="white" width="80"><path d="M20 18h-1c-1.1 0-2-.9-2-2V8c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2H4c-1.1 0-2 .9-2 2h20l-2-3zM5 8h9v5H5V8z"/></svg>'
-trailer_svg = '<svg viewBox="0 0 24 24" fill="white" width="100"><path d="M2 15h16v-5H2v5zm18-5v7h2v-7h-2zM2 17h16c0 1.1.9 2 2 2s2-.9 2-2H2z"/></svg>'
-full_truck_svg = '<svg viewBox="0 0 24 24" fill="white" width="120"><path d="M2 16h2c0 1.1.9 2 2 2s2-.9 2-2h8c0 1.1.9 2 2 2s2-.9 2-2h2v-5H2v5zm0-6h14V5H2v5zm16 0h4v3h-4v-3z"/></svg>'
+# --- ΣΧΕΔΙΑΣΜΟΣ ΡΕΑΛΙΣΤΙΚΩΝ ΕΙΚΟΝΙΔΙΩΝ (SVG) ---
+# Σχεδιάζουμε τον ευρωπαϊκό τράκτορα, την πλατφόρμα και το κοντέινερ με κώδικα
+# για να μην εξαρτόμαστε από εξωτερικά sites και να φαίνονται σωστά.
 
-# --- CUSTOM CSS ΓΙΑ ΕΠΑΓΓΕΛΜΑΤΙΚΟ UI ---
-st.markdown(f"""
+# 1. Ευρωπαϊκός Τράκτορας (Flat-nose)
+tractor_svg = '''<svg viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="10" y="10" width="30" height="30" rx="2" fill="#00D2FF"/>
+<rect x="40" y="30" width="10" height="10" fill="#00D2FF"/>
+<circle cx="18" cy="42" r="5" fill="white"/>
+<circle cx="35" cy="42" r="5" fill="white"/>
+<rect x="15" y="15" width="15" height="10" fill="#1a1a1a"/>
+</svg>'''
+
+# 2. Τράκτορας με Άδεια Νταλίκα (Πλατφόρμα)
+trailer_svg = '''<svg viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="5" y="15" width="25" height="25" rx="2" fill="#00D2FF"/>
+<rect x="30" y="32" width="60" height="5" fill="silver"/>
+<circle cx="12" cy="42" r="4" fill="white"/>
+<circle cx="23" cy="42" r="4" fill="white"/>
+<circle cx="75" cy="42" r="4" fill="white"/>
+<circle cx="85" cy="42" r="4" fill="white"/>
+</svg>'''
+
+# 3. Τράκτορας με Νταλίκα και Κοντέινερ (Κουτί)
+full_svg = '''<svg viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="5" y="15" width="25" height="25" rx="2" fill="#00D2FF"/>
+<rect x="30" y="32" width="60" height="5" fill="silver"/>
+<rect x="35" y="12" width="55" height="20" rx="1" fill="#FF4B4B"/>
+<path d="M40 12V32M45 12V32M50 12V32" stroke="rgba(255,255,255,0.3)"/>
+<circle cx="12" cy="42" r="4" fill="white"/>
+<circle cx="75" cy="42" r="4" fill="white"/>
+<circle cx="85" cy="42" r="4" fill="white"/>
+</svg>'''
+
+# --- ΕΜΦΑΝΙΣΗ (CSS) ---
+st.markdown("""
     <style>
-    .stApp {{
-        background: #1a1a1a;
-    }}
-    /* Καλούπι για τα κουμπιά επιλογής */
-    .config-box {{
-        background: rgba(255, 255, 255, 0.05);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
+    .stApp { background: #0e1117; }
+    .card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
         padding: 20px;
         text-align: center;
-        transition: 0.3s;
         margin-bottom: 10px;
-    }}
-    .config-box:hover {{
-        border-color: #00d2ff;
-        background: rgba(0, 210, 255, 0.05);
-    }}
-    /* Μεγάλα κουμπιά ΞΕΚΙΝΗΣΑ / ΕΦΤΑΣΑ */
-    .action-btn button {{
-        height: 120px !important;
-        font-size: 22px !important;
-        border-radius: 25px !important;
-    }}
-    h1, h2, h3, p {{ color: white !important; font-family: 'Inter', sans-serif; }}
+    }
+    .stButton>button {
+        width: 100%;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    h1, h2, h3 { color: white !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ΔΗΜΙΟΥΡΓΙΑ ΒΑΣΗΣ ΔΕΔΟΜΕΝΩΝ ---
+# --- ΒΑΣΗ ΔΕΔΟΜΕΝΩΝ ---
 def init_db():
+    # Δημιουργία σύνδεσης με το αρχείο logiwork.db
     conn = sqlite3.connect('logiwork.db')
     c = conn.cursor()
+    # Πίνακας για τις κινήσεις (Ώρα, Τι έκανα, Ποιο όχημα)
     c.execute('CREATE TABLE IF NOT EXISTS movements (id INTEGER PRIMARY KEY, timestamp TEXT, action TEXT, config TEXT)')
     conn.commit()
     conn.close()
 
 init_db()
 
-# --- ΕΛΕΓΧΟΣ ΚΑΤΑΣΤΑΣΗΣ ---
+# --- ΕΛΕΓΧΟΣ ΣΤΑΔΙΟΥ (STATE) ---
 if 'stage' not in st.session_state:
     st.session_state.stage = 'select_config'
-if 'current_config' not in st.session_state:
-    st.session_state.current_config = None
 
 st.title("🚛 LogiWork Pass")
 
-# --- ΟΘΟΝΗ 1: ΕΠΑΓΓΕΛΜΑΤΙΚΗ ΕΠΙΛΟΓΗ ΣΥΝΘΕΣΗΣ ---
+# --- ΟΘΟΝΗ 1: ΕΠΙΛΟΓΗ ΣΥΝΘΕΣΗΣ ---
 if st.session_state.stage == 'select_config':
-    st.subheader("ΕΠΙΛΟΓΗ ΣΥΝΘΕΣΗΣ")
+    st.subheader("Τι οδηγείς τώρα;")
     
-    col1, col2, col3 = st.columns(3)
+    c1, c2, c3 = st.columns(3)
     
-    with col1:
-        st.markdown(f'<div class="config-box">{tractor_svg}</div>', unsafe_allow_html=True)
-        if st.button("ΣΚΕΤΟΣ\nΤΡΑΚΤΟΡΑΣ", key="btn1"):
+    with c1:
+        st.markdown(f'<div class="card">{tractor_svg}</div>', unsafe_allow_html=True)
+        if st.button("ΣΚΕΤΟΣ\nΤΡΑΚΤΟΡΑΣ"):
             st.session_state.current_config = "Σκέτος Τράκτορας"
             st.session_state.stage = 'actions'
             st.rerun()
-            
-    with col2:
-        st.markdown(f'<div class="config-box">{trailer_svg}</div>', unsafe_allow_html=True)
-        if st.button("ΤΡΑΚΤΟΡΑΣ\n+\nΝΤΑΛΙΚΑ", key="btn2"):
+
+    with c2:
+        st.markdown(f'<div class="card">{trailer_svg}</div>', unsafe_allow_html=True)
+        if st.button("ΤΡΑΚΤΟΡΑΣ\n+\nΝΤΑΛΙΚΑ"):
             st.session_state.current_config = "Τράκτορας + Νταλίκα"
             st.session_state.stage = 'actions'
             st.rerun()
-            
-    with col3:
-        st.markdown(f'<div class="config-box">{full_truck_svg}</div>', unsafe_allow_html=True)
-        if st.button("ΤΡΑΚΤΟΡΑΣ\n+\nΚΟΥΤΙ", key="btn3"):
+
+    with c3:
+        st.markdown(f'<div class="card">{full_svg}</div>', unsafe_allow_html=True)
+        if st.button("ΤΡΑΚΤΟΡΑΣ\n+\nΚΟΥΤΙ"):
             st.session_state.current_config = "Τράκτορας + Κουτί"
             st.session_state.stage = 'actions'
             st.rerun()
 
 # --- ΟΘΟΝΗ 2: ΚΟΥΜΠΙΑ ΔΡΑΣΗΣ ---
 elif st.session_state.stage == 'actions':
-    st.markdown(f"### Ενεργή Μονάδα: {st.session_state.current_config}")
+    st.markdown(f"### Επιλογή: {st.session_state.current_config}")
     
     col_a, col_b = st.columns(2)
     
     with col_a:
-        if st.button("🚀 ΞΕΚΙΝΗΣΑ", use_container_width=True, type="primary"):
+        # Κουμπί για έναρξη δρομολογίου
+        if st.button("🚀 ΞΕΚΙΝΗΣΑ", use_container_width=True):
             conn = sqlite3.connect('logiwork.db')
             c = conn.cursor()
             now = datetime.now().strftime("%d/%m/%Y %H:%M")
@@ -102,9 +124,10 @@ elif st.session_state.stage == 'actions':
                       (now, "ΞΕΚΙΝΗΣΑ", st.session_state.current_config))
             conn.commit()
             conn.close()
-            st.success("ΚΑΤΑΓΡΑΦΗΚΕ")
+            st.success("Έναρξη!")
 
     with col_b:
+        # Κουμπί για ολοκλήρωση
         if st.button("🏁 ΕΦΤΑΣΑ", use_container_width=True):
             conn = sqlite3.connect('logiwork.db')
             c = conn.cursor()
@@ -113,9 +136,9 @@ elif st.session_state.stage == 'actions':
                       (now, "ΕΦΤΑΣΑ", st.session_state.current_config))
             conn.commit()
             conn.close()
-            st.info("ΚΑΤΑΓΡΑΦΗΚΕ")
+            st.info("Άφιξη!")
         
-    if st.button("🔄 ΑΛΛΑΓΗ ΣΥΝΘΕΣΗΣ"):
+    if st.button("🔄 Αλλαγή Οχήματος"):
         st.session_state.stage = 'select_config'
         st.rerun()
 
