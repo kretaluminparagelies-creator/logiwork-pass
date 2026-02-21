@@ -3,51 +3,51 @@ import sqlite3
 from datetime import datetime
 import pandas as pd
 
-# --- [CHECKPOINT 23: BOOTSTRAP ICON SYSTEM] ---
-# Στάδιο: Χρήση εξωτερικής βιβλιοθήκης εικονιδίων (Bootstrap) για εγγυημένη εμφάνιση.
+# --- [CHECKPOINT 24: SOLID TEXT-BASED UI] ---
+# Στάδιο: Κατάργηση όλων των εξωτερικών αρχείων. Χρήση καθαρού κειμένου και χρωμάτων.
 
 st.set_page_config(page_title="LogiWork Pass", layout="centered")
 
-# Εισαγωγή της βιβλιοθήκης εικονιδίων Bootstrap μέσω HTML
-st.markdown('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">', unsafe_allow_html=True)
-
-# --- CSS ΓΙΑ ΕΠΑΓΓΕΛΜΑΤΙΚΟ UI ---
+# --- CSS ΓΙΑ ΕΠΑΓΓΕΛΜΑΤΙΚΑ ΚΟΥΜΠΙΑ ΧΩΡΙΣ ΕΙΚΟΝΕΣ ---
 st.markdown("""
     <style>
-    .stApp { background-color: #111827; }
+    .stApp { background-color: #0e1117; }
     
-    /* Το κουτί που περιέχει το εικονίδιο */
-    .icon-box {
-        background: #1f2937;
+    /* Μεγάλα τετράγωνα κουμπιά επιλογής */
+    .truck-box {
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #1f2937;
+        border: 3px solid #3b82f6;
         border-radius: 20px;
-        padding: 30px;
-        text-align: center;
-        border: 2px solid #374151;
+        color: white;
+        font-size: 50px;
         margin-bottom: 10px;
-        color: #60a5fa;
     }
     
-    /* Μέγεθος εικονιδίων */
-    .icon-box i {
-        font-size: 60px;
+    /* Κουμπιά Δράσης */
+    .action-btn-start button {
+        background-color: #059669 !important;
+        height: 120px !important;
+        font-size: 25px !important;
+        border-radius: 25px !important;
+        color: white !important;
+    }
+    .action-btn-stop button {
+        background-color: #dc2626 !important;
+        height: 120px !important;
+        font-size: 25px !important;
+        border-radius: 25px !important;
+        color: white !important;
     }
     
-    /* Στυλ κουμπιών */
-    .stButton>button {
-        width: 100%;
-        border-radius: 12px;
-        height: 50px;
-        font-weight: bold;
-    }
-    
-    .action-start button { background: #059669 !important; height: 100px !important; font-size: 22px !important; }
-    .action-stop button { background: #dc2626 !important; height: 100px !important; font-size: 22px !important; }
-    
-    h1, h2, h3 { color: white !important; text-align: center; }
+    h1, h2, h3, p { color: white !important; text-align: center; font-family: 'Arial'; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ΒΑΣΗ ΔΕΔΟΜΕΝΩΝ ---
+# --- DATABASE SETUP ---
 def init_db():
     conn = sqlite3.connect('logiwork.db')
     c = conn.cursor()
@@ -70,24 +70,24 @@ if st.session_state.stage == 'select_config':
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        # Εικονίδιο για Σκέτο Τράκτορα (Truck Front)
-        st.markdown('<div class="icon-box"><i class="bi bi-truck-flatbed"></i></div>', unsafe_allow_html=True)
+        # Οπτικό πλαίσιο για Τράκτορα
+        st.markdown('<div class="truck-box">🚜</div>', unsafe_allow_html=True)
         if st.button("ΣΚΕΤΟΣ\nΤΡΑΚΤΟΡΑΣ"):
             st.session_state.current_config = "Σκέτος Τράκτορας"
             st.session_state.stage = 'actions'
             st.rerun()
 
     with col2:
-        # Εικονίδιο για Τράκτορα + Νταλίκα (Truck Profile)
-        st.markdown('<div class="icon-box"><i class="bi bi-truck"></i></div>', unsafe_allow_html=True)
+        # Οπτικό πλαίσιο για Τράκτορα + Νταλίκα
+        st.markdown('<div class="truck-box">🚛</div>', unsafe_allow_html=True)
         if st.button("ΤΡΑΚΤΟΡΑΣ\n+\nΝΤΑΛΙΚΑ"):
             st.session_state.current_config = "Τράκτορας + Νταλίκα"
             st.session_state.stage = 'actions'
             st.rerun()
 
     with col3:
-        # Εικονίδιο για Τράκτορα + Κουτί (Box/Frontier)
-        st.markdown('<div class="icon-box"><i class="bi bi-archive-fill"></i></div>', unsafe_allow_html=True)
+        # Οπτικό πλαίσιο για Τράκτορα + Κουτί
+        st.markdown('<div class="truck-box">📦</div>', unsafe_allow_html=True)
         if st.button("ΤΡΑΚΤΟΡΑΣ\n+\nΚΟΥΤΙ"):
             st.session_state.current_config = "Τράκτορας + Κουτί"
             st.session_state.stage = 'actions'
@@ -99,8 +99,8 @@ elif st.session_state.stage == 'actions':
     
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown('<div class="action-start">', unsafe_allow_html=True)
-        if st.button("ΞΕΚΙΝΗΣΑ"):
+        st.markdown('<div class="action-btn-start">', unsafe_allow_html=True)
+        if st.button("🚀 ΞΕΚΙΝΗΣΑ"):
             conn = sqlite3.connect('logiwork.db')
             c = conn.cursor()
             now = datetime.now().strftime("%d/%m/%Y %H:%M")
@@ -112,8 +112,8 @@ elif st.session_state.stage == 'actions':
         st.markdown('</div>', unsafe_allow_html=True)
         
     with c2:
-        st.markdown('<div class="action-stop">', unsafe_allow_html=True)
-        if st.button("ΕΦΤΑΣΑ"):
+        st.markdown('<div class="action-btn-stop">', unsafe_allow_html=True)
+        if st.button("🏁 ΕΦΤΑΣΑ"):
             conn = sqlite3.connect('logiwork.db')
             c = conn.cursor()
             now = datetime.now().strftime("%d/%m/%Y %H:%M")
@@ -124,6 +124,7 @@ elif st.session_state.stage == 'actions':
             st.info("ΚΑΤΑΓΡΑΦΗΚΕ!")
         st.markdown('</div>', unsafe_allow_html=True)
 
+    st.write("")
     if st.button("🔄 ΑΛΛΑΓΗ ΟΧΗΜΑΤΟΣ"):
         st.session_state.stage = 'select_config'
         st.rerun()
@@ -133,5 +134,5 @@ st.markdown("---")
 if st.checkbox("📅 ΒΙΒΛΙΟ ΔΡΟΜΟΛΟΓΙΩΝ"):
     conn = sqlite3.connect('logiwork.db')
     df = pd.read_sql_query("SELECT timestamp as 'Ώρα', action as 'Ενέργεια', config as 'Σύνθεση' FROM movements ORDER BY id DESC", conn)
-    st.table(df)
+    st.dataframe(df, use_container_width=True)
     conn.close()
