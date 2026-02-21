@@ -3,143 +3,145 @@ import sqlite3
 from datetime import datetime
 import pandas as pd
 
-# --- [CHECKPOINT 25: MANUAL HTML INTERFACE] ---
-# Στάδιο: Πλήρης κατάργηση εικονιδίων. Χρήση χειροκίνητου HTML για 100% αξιοπιστία.
+# --- [CHECKPOINT 26: BULLETPROOF UI] ---
+# Στάδιο: Κατάργηση κάθε γραφικού. Χρήση μόνο Full-Width κουμπιών για 100% λειτουργικότητα.
 
 st.set_page_config(page_title="LogiWork Pass", layout="centered")
 
 # --- CSS ΓΙΑ ΕΠΑΓΓΕΛΜΑΤΙΚΟ ΚΑΙ ΣΤΑΘΕΡΟ UI ---
 st.markdown("""
     <style>
-    /* Φόντο εφαρμογής */
-    .stApp { background-color: #050505; }
+    /* Σκούρο επαγγελματικό φόντο */
+    .stApp { background-color: #000000; }
     
-    /* Τίτλος */
-    .main-title {
-        color: #ffffff;
+    /* Τίτλος Εφαρμογής */
+    .app-header {
+        color: #00d2ff;
         text-align: center;
-        font-family: 'Arial Black', sans-serif;
+        font-size: 32px;
+        font-weight: bold;
         padding: 20px;
-        border-bottom: 2px solid #333;
+        border-bottom: 1px solid #333;
+        margin-bottom: 30px;
     }
 
-    /* Στυλ για τα μεγάλα κουμπιά επιλογής */
-    .stButton > button {
-        background-color: #1a1a1a !important;
-        color: #00d2ff !important;
-        border: 2px solid #00d2ff !important;
-        border-radius: 15px !important;
-        height: 120px !important;
-        font-size: 20px !important;
+    /* Στυλ για τα κουμπιά επιλογής (Τράκτορας κτλ) */
+    div.stButton > button {
+        width: 100% !important;
+        height: 100px !important;
+        font-size: 22px !important;
         font-weight: bold !important;
-        margin-bottom: 10px !important;
-        text-transform: uppercase;
+        border-radius: 15px !important;
+        margin-bottom: 15px !important;
+        background-color: #1a1a1a !important;
+        color: white !important;
+        border: 2px solid #444 !important;
     }
     
-    /* Hover εφέ */
-    .stButton > button:hover {
-        background-color: #00d2ff !important;
-        color: #000000 !important;
+    /* Χρώμα όταν επιλεγεί κάτι */
+    div.stButton > button:active, div.stButton > button:focus {
+        border-color: #00d2ff !important;
+        color: #00d2ff !important;
     }
 
-    /* Κουμπιά Δράσης (ΞΕΚΙΝΗΣΑ / ΕΦΤΑΣΑ) */
-    .action-start button {
-        background-color: #008000 !important;
+    /* Κουμπιά Δράσης (ΞΕΚΙΝΗΣΑ - Πράσινο / ΕΦΤΑΣΑ - Κόκκινο) */
+    .btn-green button {
+        background-color: #006400 !important;
         border: none !important;
-        color: white !important;
-        height: 100px !important;
+        height: 120px !important;
+        font-size: 26px !important;
     }
-    .action-stop button {
+    .btn-red button {
         background-color: #8B0000 !important;
         border: none !important;
-        color: white !important;
-        height: 100px !important;
+        height: 120px !important;
+        font-size: 26px !important;
     }
     
-    h1, h2, h3 { color: white !important; text-align: center; }
+    h1, h2, h3, p { color: white !important; text-align: center; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ΔΙΑΧΕΙΡΙΣΗ ΒΑΣΗΣ ΔΕΔΟΜΕΝΩΝ ---
+# --- ΒΑΣΗ ΔΕΔΟΜΕΝΩΝ (SQLite) ---
 def init_db():
-    # Δημιουργία αρχείου βάσης δεδομένων
+    # Δημιουργούμε τη βάση δεδομένων logiwork.db αν δεν υπάρχει
     conn = sqlite3.connect('logiwork.db')
     c = conn.cursor()
-    # Στήλες: ID, Ημερομηνία/Ώρα, Ενέργεια, Τύπος Φορτηγού
+    # Πίνακας movements: Καταγράφει πότε, τι έγινε και με ποιο όχημα
     c.execute('CREATE TABLE IF NOT EXISTS movements (id INTEGER PRIMARY KEY, timestamp TEXT, action TEXT, config TEXT)')
     conn.commit()
     conn.close()
 
 init_db()
 
-# --- ΕΛΕΓΧΟΣ ΚΑΤΑΣΤΑΣΗΣ ---
+# --- APP STATE ---
 if 'stage' not in st.session_state:
     st.session_state.stage = 'select_config'
 
-st.markdown('<h1 class="main-title">LOGIWORK PASS</h1>', unsafe_allow_html=True)
+st.markdown('<div class="app-header">LOGIWORK PASS v1.0</div>', unsafe_allow_html=True)
 
-# --- ΟΘΟΝΗ 1: ΕΠΙΛΟΓΗ ΣΥΝΘΕΣΗΣ ---
+# --- ΟΘΟΝΗ 1: ΕΠΙΛΟΓΗ ΟΧΗΜΑΤΟΣ ---
 if st.session_state.stage == 'select_config':
-    st.subheader("ΕΠΙΛΕΞΤΕ ΣΥΝΘΕΣΗ")
+    st.subheader("ΒΗΜΑ 1: ΕΠΙΛΕΞΤΕ ΟΧΗΜΑ")
     
-    # Επιλογή 1: Σκέτος Τράκτορας
-    if st.button("🚛 ΣΚΕΤΟΣ ΤΡΑΚΤΟΡΑΣ"):
+    # Μεγάλα κουμπιά - Ένα σε κάθε σειρά για ευκολία στο κινητό
+    if st.button("1. ΣΚΕΤΟΣ ΤΡΑΚΤΟΡΑΣ"):
         st.session_state.current_config = "Σκέτος Τράκτορας"
         st.session_state.stage = 'actions'
         st.rerun()
 
-    # Επιλογή 2: Τράκτορας + Νταλίκα
-    if st.button("🚚 ΤΡΑΚΤΟΡΑΣ + ΝΤΑΛΙΚΑ"):
+    if st.button("2. ΤΡΑΚΤΟΡΑΣ + ΝΤΑΛΙΚΑ"):
         st.session_state.current_config = "Τράκτορας + Νταλίκα"
         st.session_state.stage = 'actions'
         st.rerun()
 
-    # Επιλογή 3: Τράκτορας + Κουτί
-    if st.button("📦 ΤΡΑΚΤΟΡΑΣ + ΚΟΥΤΙ"):
+    if st.button("3. ΤΡΑΚΤΟΡΑΣ + ΚΟΥΤΙ (Full)"):
         st.session_state.current_config = "Τράκτορας + Κουτί"
         st.session_state.stage = 'actions'
         st.rerun()
 
-# --- ΟΘΟΝΗ 2: ΚΟΥΜΠΙΑ ΔΡΑΣΗΣ ---
+# --- ΟΘΟΝΗ 2: ΚΑΤΑΓΡΑΦΗ ΚΙΝΗΣΗΣ ---
 elif st.session_state.stage == 'actions':
-    st.markdown(f"### ΤΩΡΑ: {st.session_state.current_config}")
+    st.subheader(f"ΟΧΗΜΑ: {st.session_state.current_config}")
     
-    col_left, col_right = st.columns(2)
+    # Δύο μεγάλα κουμπιά δίπλα-δίπλα
+    col_start, col_end = st.columns(2)
     
-    with col_left:
-        st.markdown('<div class="action-start">', unsafe_allow_html=True)
+    with col_start:
+        st.markdown('<div class="btn-green">', unsafe_allow_html=True)
         if st.button("ΞΕΚΙΝΗΣΑ"):
             conn = sqlite3.connect('logiwork.db')
             c = conn.cursor()
-            now = datetime.now().strftime("%d/%m/%Y %H:%M")
+            now = datetime.now().strftime("%H:%M - %d/%m/%Y")
             c.execute("INSERT INTO movements (timestamp, action, config) VALUES (?, ?, ?)", 
-                      (now, "ΞΕΚΙΝΗΣΑ", st.session_state.current_config))
+                      (now, "ΕΝΑΡΞΗ", st.session_state.current_config))
             conn.commit()
             conn.close()
             st.success("ΚΑΤΑΓΡΑΦΗΚΕ")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    with col_right:
-        st.markdown('<div class="action-stop">', unsafe_allow_html=True)
+    with col_end:
+        st.markdown('<div class="btn-red">', unsafe_allow_html=True)
         if st.button("ΕΦΤΑΣΑ"):
             conn = sqlite3.connect('logiwork.db')
             c = conn.cursor()
-            now = datetime.now().strftime("%d/%m/%Y %H:%M")
+            now = datetime.now().strftime("%H:%M - %d/%m/%Y")
             c.execute("INSERT INTO movements (timestamp, action, config) VALUES (?, ?, ?)", 
-                      (now, "ΕΦΤΑΣΑ", st.session_state.current_config))
+                      (now, "ΑΦΙΞΗ", st.session_state.current_config))
             conn.commit()
             conn.close()
-            st.info("ΚΑΤΑΓΡΑΦΗΚΕ")
+            st.error("ΚΑΤΑΓΡΑΦΗΚΕ")
         st.markdown('</div>', unsafe_allow_html=True)
         
-    if st.button("🔄 ΑΛΛΑΓΗ ΣΥΝΘΕΣΗΣ"):
+    st.write("---")
+    if st.button("🔄 ΑΛΛΑΓΗ ΕΠΙΛΟΓΗΣ"):
         st.session_state.stage = 'select_config'
         st.rerun()
 
-# --- ΙΣΤΟΡΙΚΟ ---
-st.markdown("---")
-if st.checkbox("ΠΡΟΒΟΛΗ ΙΣΤΟΡΙΚΟΥ"):
+# --- ΙΣΤΟΡΙΚΟ ΔΡΟΜΟΛΟΓΙΩΝ ---
+st.write("")
+if st.checkbox("🔍 ΕΜΦΑΝΙΣΗ ΙΣΤΟΡΙΚΟΥ"):
     conn = sqlite3.connect('logiwork.db')
-    df = pd.read_sql_query("SELECT timestamp as 'Ώρα', action as 'Ενέργεια', config as 'Σύνθεση' FROM movements ORDER BY id DESC", conn)
-    st.table(df)
+    df = pd.read_sql_query("SELECT timestamp as 'Ώρα/Ημερ.', action as 'Ενέργεια', config as 'Όχημα' FROM movements ORDER BY id DESC", conn)
+    st.table(df) # Το table είναι πιο σταθερό οπτικά από το dataframe
     conn.close()
