@@ -3,73 +3,71 @@ import sqlite3
 from datetime import datetime
 import pandas as pd
 
-# --- ΡΥΘΜΙΣΕΙΣ ΣΕΛΙΔΑΣ ---
+# --- [CHECKPOINT 21: FINAL RECTIFICATION] ---
+# Στάδιο: Οριστική διόρθωση εμφάνισης με επαγγελματικά εικονίδια
+
 st.set_page_config(page_title="LogiWork Pass", layout="centered")
 
-# --- CSS ΓΙΑ ΕΠΑΓΓΕΛΜΑΤΙΚΟ ΚΑΙ ΚΑΘΑΡΟ UI ---
+# --- ΕΠΑΓΓΕΛΜΑΤΙΚΟ UI (CSS) ---
 st.markdown("""
     <style>
-    .stApp { background: #0e1117; }
-    /* Κάρτα για την εικόνα του φορτηγού */
-    .truck-container {
-        background: rgba(255, 255, 255, 0.05);
+    .stApp { background-color: #0e1117; }
+    /* Κάρτα για την εικόνα */
+    .img-box {
+        background: #1f2937;
         border-radius: 20px;
         padding: 10px;
+        border: 2px solid #374151;
         margin-bottom: 10px;
         display: flex;
         justify-content: center;
-        border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    /* Στυλ κουμπιών επιλογής */
+    /* Κουμπιά Επιλογής */
     .stButton>button {
         width: 100%;
-        border-radius: 15px;
-        height: 60px;
+        border-radius: 12px;
+        height: 55px;
         font-weight: bold;
-        background: #1f2937;
-        color: white;
-        border: 1px solid #374151;
+        text-transform: uppercase;
     }
-    /* Μεγάλα κουμπιά ΞΕΚΙΝΗΣΑ / ΕΦΤΑΣΑ */
-    .action-start button { background: #059669 !important; height: 100px !important; font-size: 20px !important; }
-    .action-stop button { background: #dc2626 !important; height: 100px !important; font-size: 20px !important; }
-    h1, h2, h3, p { color: white !important; text-align: center; font-family: 'Inter', sans-serif; }
+    /* Κουμπιά Δράσης */
+    .action-start button { background-color: #10b981 !important; height: 90px !important; font-size: 20px !important; }
+    .action-stop button { background-color: #ef4444 !important; height: 90px !important; font-size: 20px !important; }
+    h1, h2, h3, p { color: white !important; text-align: center; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ΒΑΣΗ ΔΕΔΟΜΕΝΩΝ (SQLite) ---
+# --- ΒΑΣΗ ΔΕΔΟΜΕΝΩΝ ---
 def init_db():
-    # Δημιουργία ή σύνδεση στο logiwork.db
     conn = sqlite3.connect('logiwork.db')
     c = conn.cursor()
-    # Αποθήκευση: Ώρα, Ενέργεια, Τύπος Οχήματος
     c.execute('CREATE TABLE IF NOT EXISTS movements (id INTEGER PRIMARY KEY, timestamp TEXT, action TEXT, config TEXT)')
     conn.commit()
     conn.close()
 
 init_db()
 
-# --- ΕΙΚΟΝΕΣ ΠΡΑΓΜΑΤΙΚΟΥ ΣΤΟΛΟΥ (URLs) ---
-# Χρησιμοποιούμε ρεαλιστικές απεικονίσεις φορτηγών
-URL_TRACTOR = "https://cdn-icons-png.flaticon.com/512/2555/2555013.png" # Flat-nose Τράκτορας
-URL_TRAILER = "https://cdn-icons-png.flaticon.com/512/3211/3211116.png" # Τράκτορας με άδεια νταλίκα
-URL_CONTAINER = "https://cdn-icons-png.flaticon.com/512/1042/1042331.png" # Πλήρες με κοντέινερ
+# --- ΕΓΓΥΗΜΕΝΑ ΕΠΑΓΓΕΛΜΑΤΙΚΑ ΕΙΚΟΝΙΔΙΑ ---
+# Χρήση σταθερών πηγών για Ευρωπαϊκά Φορτηγά
+IMG_TRACTOR = "https://img.icons8.com/external-flat-icons-inmotus-design/200/external-Tractor-truck-flat-icons-inmotus-design.png"
+IMG_TRAILER = "https://img.icons8.com/external-flat-icons-inmotus-design/200/external-Trailer-truck-flat-icons-inmotus-design.png"
+IMG_FULL = "https://img.icons8.com/external-flat-icons-inmotus-design/200/external-Container-truck-flat-icons-inmotus-design.png"
 
-# --- ΔΙΑΧΕΙΡΙΣΗ ΡΟΗΣ (App State) ---
+# --- ΕΛΕΓΧΟΣ ΡΟΗΣ ---
 if 'stage' not in st.session_state:
     st.session_state.stage = 'select_config'
 
 st.title("🚛 LogiWork Pass")
 
-# --- ΣΤΑΔΙΟ 1: ΕΠΙΛΟΓΗ ΟΧΗΜΑΤΟΣ ---
+# --- ΟΘΟΝΗ 1: ΕΠΙΛΟΓΗ ---
 if st.session_state.stage == 'select_config':
-    st.subheader("Τι οδηγείς τώρα;")
+    st.subheader("ΤΙ ΟΔΗΓΕΙΣ ΤΩΡΑ;")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.markdown('<div class="truck-container">', unsafe_allow_html=True)
-        st.image(URL_TRACTOR, width=100)
+        st.markdown('<div class="img-box">', unsafe_allow_html=True)
+        st.image(IMG_TRACTOR, width=120)
         st.markdown('</div>', unsafe_allow_html=True)
         if st.button("ΣΚΕΤΟΣ\nΤΡΑΚΤΟΡΑΣ"):
             st.session_state.current_config = "Σκέτος Τράκτορας"
@@ -77,8 +75,8 @@ if st.session_state.stage == 'select_config':
             st.rerun()
 
     with col2:
-        st.markdown('<div class="truck-container">', unsafe_allow_html=True)
-        st.image(URL_TRAILER, width=100)
+        st.markdown('<div class="img-box">', unsafe_allow_html=True)
+        st.image(IMG_TRAILER, width=120)
         st.markdown('</div>', unsafe_allow_html=True)
         if st.button("ΤΡΑΚΤΟΡΑΣ\n+\nΝΤΑΛΙΚΑ"):
             st.session_state.current_config = "Τράκτορας + Νταλίκα"
@@ -86,23 +84,22 @@ if st.session_state.stage == 'select_config':
             st.rerun()
 
     with col3:
-        st.markdown('<div class="truck-container">', unsafe_allow_html=True)
-        st.image(URL_CONTAINER, width=100)
+        st.markdown('<div class="img-box">', unsafe_allow_html=True)
+        st.image(IMG_FULL, width=120)
         st.markdown('</div>', unsafe_allow_html=True)
         if st.button("ΤΡΑΚΤΟΡΑΣ\n+\nΚΟΥΤΙ"):
             st.session_state.current_config = "Τράκτορας + Κουτί"
             st.session_state.stage = 'actions'
             st.rerun()
 
-# --- ΣΤΑΔΙΟ 2: ΚΑΤΑΓΡΑΦΗ ΔΡΟΜΟΛΟΓΙΟΥ ---
+# --- ΟΘΟΝΗ 2: ΔΡΑΣΗ ---
 elif st.session_state.stage == 'actions':
-    st.markdown(f"### Επιλογή: **{st.session_state.current_config}**")
+    st.markdown(f"### ΣΥΝΘΕΣΗ: **{st.session_state.current_config}**")
     
-    col_a, col_b = st.columns(2)
-    
-    with col_a:
+    c1, c2 = st.columns(2)
+    with c1:
         st.markdown('<div class="action-start">', unsafe_allow_html=True)
-        if st.button("🚀 ΞΕΚΙΝΗΣΑ", use_container_width=True):
+        if st.button("ΞΕΚΙΝΗΣΑ"):
             conn = sqlite3.connect('logiwork.db')
             c = conn.cursor()
             now = datetime.now().strftime("%d/%m/%Y %H:%M")
@@ -110,12 +107,12 @@ elif st.session_state.stage == 'actions':
                       (now, "ΞΕΚΙΝΗΣΑ", st.session_state.current_config))
             conn.commit()
             conn.close()
-            st.success("Έναρξη καταγράφηκε!")
+            st.toast("ΚΑΤΑΓΡΑΦΗΚΕ!")
         st.markdown('</div>', unsafe_allow_html=True)
-
-    with col_b:
+        
+    with c2:
         st.markdown('<div class="action-stop">', unsafe_allow_html=True)
-        if st.button("🏁 ΕΦΤΑΣΑ", use_container_width=True):
+        if st.button("ΕΦΤΑΣΑ"):
             conn = sqlite3.connect('logiwork.db')
             c = conn.cursor()
             now = datetime.now().strftime("%d/%m/%Y %H:%M")
@@ -123,17 +120,17 @@ elif st.session_state.stage == 'actions':
                       (now, "ΕΦΤΑΣΑ", st.session_state.current_config))
             conn.commit()
             conn.close()
-            st.info("Άφιξη καταγράφηκε!")
+            st.toast("ΚΑΤΑΓΡΑΦΗΚΕ!")
         st.markdown('</div>', unsafe_allow_html=True)
-        
+
     st.write("")
-    if st.button("🔄 Αλλαγή Οχήματος / Σύνθεσης"):
+    if st.button("🔄 ΑΛΛΑΓΗ ΟΧΗΜΑΤΟΣ"):
         st.session_state.stage = 'select_config'
         st.rerun()
 
-# --- ΙΣΤΟΡΙΚΟ (TABLE) ---
+# --- ΙΣΤΟΡΙΚΟ ---
 st.markdown("---")
-if st.checkbox("📅 ΠΡΟΒΟΛΗ ΙΣΤΟΡΙΚΟΥ"):
+if st.checkbox("📅 ΠΡΟΒΟΛΗ ΒΙΒΛΙΟΥ ΔΡΟΜΟΛΟΓΙΩΝ"):
     conn = sqlite3.connect('logiwork.db')
     df = pd.read_sql_query("SELECT timestamp as 'Ώρα', action as 'Ενέργεια', config as 'Σύνθεση' FROM movements ORDER BY id DESC", conn)
     st.dataframe(df, use_container_width=True)
